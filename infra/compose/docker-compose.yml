@@ -1,4 +1,15 @@
 services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: main
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
   redis:
     image: redis:7-alpine
     ports:
@@ -12,9 +23,11 @@ services:
       APP_ENV: development
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/1
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@postgres:5432/main
     ports:
       - "8000:8000"
     depends_on:
+      - postgres
       - redis
 
   worker:
@@ -25,5 +38,10 @@ services:
       APP_ENV: development
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/1
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@postgres:5432/main
     depends_on:
+      - postgres
       - redis
+
+volumes:
+  postgres-data:

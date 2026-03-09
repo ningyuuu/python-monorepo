@@ -18,15 +18,14 @@ A Python-native monorepo for a FastAPI service, a Celery worker, and shared inte
 - `packages/core` — shared config and runtime helpers
 - `packages/domain` — reusable domain logic
 - `packages/contracts` — shared Pydantic models
+- `packages/tasks-db` — shared PostgreSQL task persistence library
 
 ## Getting started
 
 1. Install `uv`.
 2. Run `make sync`.
 3. Copy `.env.example` to `.env` if you want to override defaults.
-4. Start Redis if you want to run the worker.
-
-Once the API is running, the OpenAPI document is available at `/openapi.json` and the docs UI at `/docs`.
+4. Start PostgreSQL and Redis if you want to run the worker.
 
 ## Docker
 

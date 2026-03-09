@@ -1,6 +1,7 @@
+from core import get_settings
 from fastapi import FastAPI
-from monorepo_core import get_settings
 
+from api_service.routes.add import router as add_router
 from api_service.routes.health import router as health_router
 
 settings = get_settings()
@@ -12,4 +13,5 @@ def read_root() -> dict[str, str]:
     return {"message": "Welcome to python-monorepo API"}
 
 
+app.include_router(add_router)
 app.include_router(health_router)

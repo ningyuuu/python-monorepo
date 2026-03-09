@@ -24,6 +24,7 @@ pythonpath = [
   "packages/core/src",
   "packages/domain/src",
   "packages/contracts/src",
+  "packages/tasks-db/src",
 ]
 testpaths = ["apps", "packages"]
 
@@ -36,12 +37,17 @@ mypy_path = [
   "packages/core/src",
   "packages/domain/src",
   "packages/contracts/src",
+  "packages/tasks-db/src",
 ]
 exclude = ["infra/"]
 
 [[tool.mypy.overrides]]
 module = ["celery", "celery.*"]
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["sqlalchemy", "sqlalchemy.*"]
+ignore_missing_imports = false
 
 [[tool.mypy.overrides]]
 module = ["celery_worker.tasks.*"]

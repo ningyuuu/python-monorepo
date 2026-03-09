@@ -1,6 +1,6 @@
+from contracts import HealthResponse
+from core import get_settings
 from fastapi import APIRouter
-from monorepo_contracts import HealthResponse
-from monorepo_core import get_settings
 from monorepo_domain import build_status_message
 
 router = APIRouter(tags=["health"])

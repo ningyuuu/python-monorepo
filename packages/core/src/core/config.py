@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     app_env: str = "development"
     celery_broker_url: str = "redis://localhost:6379/0"
     celery_result_backend: str = "redis://localhost:6379/1"
+    database_url: str = "postgresql+psycopg://postgres:postgres@localhost:5432/main"
     log_level: str = "INFO"
 
     model_config = SettingsConfigDict(

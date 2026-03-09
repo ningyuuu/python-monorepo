@@ -1,5 +1,5 @@
 from celery import Celery
-from monorepo_core import get_settings
+from core import get_settings
 
 settings = get_settings()
 

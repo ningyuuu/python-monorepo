@@ -4,10 +4,12 @@ version = "0.1.0"
 description = "FastAPI app for python-monorepo"
 requires-python = ">=3.12"
 dependencies = [
+  "celery[redis]>=5.5.3",
   "fastapi>=0.116.1",
   "monorepo-contracts",
   "monorepo-core",
   "monorepo-domain",
+  "monorepo-tasks-db",
   "uvicorn[standard]>=0.35.0",
 ]
 
@@ -15,6 +17,7 @@ dependencies = [
 monorepo-contracts = { workspace = true }
 monorepo-core = { workspace = true }
 monorepo-domain = { workspace = true }
+monorepo-tasks-db = { workspace = true }
 
 [build-system]
 requires = ["hatchling>=1.27.0"]
