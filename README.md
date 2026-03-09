@@ -26,15 +26,6 @@ A Python-native monorepo for a FastAPI service, a Celery worker, and shared inte
 3. Copy `.env.example` to `.env` if you want to override defaults.
 4. Start Redis if you want to run the worker.
 
-## Common commands
-
-- `make dev-api`
-- `make dev-worker`
-- `make lint`
-- `make fmt`
-- `make typecheck`
-- `make test`
-
 Once the API is running, the OpenAPI document is available at `/openapi.json` and the docs UI at `/docs`.
 
 ## Docker
