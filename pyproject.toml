@@ -44,5 +44,5 @@ module = ["celery", "celery.*"]
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
-module = ["monorepo_worker.tasks.*"]
+module = ["celery_worker.tasks.*"]
 disallow_untyped_decorators = false

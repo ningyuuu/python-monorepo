@@ -9,4 +9,4 @@ celery_app = Celery(
     backend=settings.celery_result_backend,
 )
 celery_app.conf.task_default_queue = "default"
-celery_app.autodiscover_tasks(["monorepo_worker.tasks"])
+celery_app.autodiscover_tasks(["celery_worker.tasks"])
