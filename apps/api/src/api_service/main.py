@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from monorepo_core import get_settings
 
-from monorepo_api.routes.health import router as health_router
+from api_service.routes.health import router as health_router
 
 settings = get_settings()
 app = FastAPI(title=settings.app_name, version="0.1.0")

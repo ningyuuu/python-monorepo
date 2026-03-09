@@ -1,6 +1,6 @@
 from monorepo_domain import add_numbers
 
-from monorepo_worker.celery_app import celery_app
+from celery_worker.celery_app import celery_app
 
 
 @celery_app.task(name="monorepo_worker.add_numbers")

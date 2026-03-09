@@ -1,4 +1,4 @@
-from monorepo_worker.tasks import add_numbers_task
+from celery_worker.tasks import add_numbers_task
 
 
 def test_add_numbers_task() -> None:

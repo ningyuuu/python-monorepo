@@ -1,5 +1,5 @@
+from api_service.main import app
 from fastapi.testclient import TestClient
-from monorepo_api.main import app
 
 client = TestClient(app)
 
