@@ -1,0 +1,15 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "make test",
+			"type": "shell",
+			"command": "make",
+			"args": [
+				"test"
+			],
+			"isBackground": false,
+			"group": "test"
+		}
+	]
+}

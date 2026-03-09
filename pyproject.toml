@@ -1,0 +1,48 @@
+[dependency-groups]
+dev = [
+  "httpx>=0.28.1",
+  "mypy>=1.18.2",
+  "pytest>=8.4.1",
+  "pytest-cov>=6.2.1",
+  "ruff>=0.13.0",
+]
+
+[tool.uv.workspace]
+members = ["apps/*", "packages/*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["B", "E", "F", "I", "UP"]
+
+[tool.pytest.ini_options]
+pythonpath = [
+  "apps/api/src",
+  "apps/worker/src",
+  "packages/core/src",
+  "packages/domain/src",
+  "packages/contracts/src",
+]
+testpaths = ["apps", "packages"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+mypy_path = [
+  "apps/api/src",
+  "apps/worker/src",
+  "packages/core/src",
+  "packages/domain/src",
+  "packages/contracts/src",
+]
+exclude = ["infra/"]
+
+[[tool.mypy.overrides]]
+module = ["celery", "celery.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["monorepo_worker.tasks.*"]
+disallow_untyped_decorators = false
