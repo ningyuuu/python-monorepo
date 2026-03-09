@@ -1,8 +1,20 @@
 from celery import Celery
-from contracts import AddNumbersRequest, TaskAcceptedResponse, TaskStatus
+from contracts import (
+    AddNumbersRequest,
+    TaskAcceptedResponse,
+    TaskDetailResponse,
+    TaskIdsResponse,
+    TaskStatus,
+)
 from core import get_settings
 from fastapi import APIRouter, HTTPException, status
-from tasks_db import create_task, mark_task_failed
+from tasks_db import (
+    TaskNotFoundError,
+    create_task,
+    get_task,
+    list_task_ids,
+    mark_task_failed,
+)
 
 router = APIRouter(tags=["tasks"])
 TASK_QUEUE = "celery"
@@ -31,3 +43,23 @@ def enqueue_add(payload: AddNumbersRequest) -> TaskAcceptedResponse:
         raise HTTPException(status_code=503, detail="Unable to enqueue task") from exc
 
     return TaskAcceptedResponse(task_id=task_record.id, status=TaskStatus.queued)
+
+
+@router.get("/add/tasks", response_model=TaskIdsResponse)
+def get_task_ids() -> TaskIdsResponse:
+    return TaskIdsResponse(task_ids=list_task_ids())
+
+
+@router.get("/add/tasks/{task_id}", response_model=TaskDetailResponse)
+def get_task_status(task_id: str) -> TaskDetailResponse:
+    try:
+        task = get_task(task_id)
+    except TaskNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="Task not found") from exc
+
+    return TaskDetailResponse(
+        task_id=task.id,
+        status=TaskStatus(task.status),
+        result=task.result,
+        error=task.error,
+    )

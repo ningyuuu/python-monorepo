@@ -1,4 +1,5 @@
 from enum import StrEnum
+from typing import Any
 
 from pydantic import BaseModel
 
@@ -24,3 +25,14 @@ class AddNumbersRequest(BaseModel):
 class TaskAcceptedResponse(BaseModel):
     task_id: str
     status: TaskStatus
+
+
+class TaskDetailResponse(BaseModel):
+    task_id: str
+    status: TaskStatus
+    result: dict[str, Any] | None
+    error: str | None
+
+
+class TaskIdsResponse(BaseModel):
+    task_ids: list[str]

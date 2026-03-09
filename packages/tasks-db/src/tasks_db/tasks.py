@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any
 from uuid import uuid4
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from .database import get_session, init_db
@@ -44,6 +45,13 @@ def get_task(task_id: str) -> TaskRecord:
         task = _get_task_record(session, task_id)
         session.expunge(task)
         return task
+
+
+def list_task_ids() -> list[str]:
+    init_db()
+    with get_session() as session:
+        statement = select(TaskRecord.id).order_by(TaskRecord.created_at.desc())
+        return list(session.scalars(statement))
 
 
 def mark_task_in_progress(task_id: str) -> TaskRecord:
