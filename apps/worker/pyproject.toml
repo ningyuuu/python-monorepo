@@ -8,6 +8,7 @@ dependencies = [
   "monorepo-core",
   "monorepo-domain",
   "monorepo-tasks-db",
+  "openai>=1.108.1",
 ]
 
 [tool.uv.sources]
