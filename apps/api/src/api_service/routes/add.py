@@ -28,7 +28,9 @@ celery_client = Celery(
 celery_client.conf.task_default_queue = TASK_QUEUE
 
 
-@router.post("/add", response_model=TaskAcceptedResponse, status_code=status.HTTP_202_ACCEPTED)
+@router.post(
+    "/tasks/add", response_model=TaskAcceptedResponse, status_code=status.HTTP_202_ACCEPTED
+)
 def enqueue_add(payload: AddNumbersRequest) -> TaskAcceptedResponse:
     task_record = create_task(task_name="add_numbers", payload={"a": payload.a, "b": payload.b})
 
@@ -45,12 +47,12 @@ def enqueue_add(payload: AddNumbersRequest) -> TaskAcceptedResponse:
     return TaskAcceptedResponse(task_id=task_record.id, status=TaskStatus.queued)
 
 
-@router.get("/add/tasks", response_model=TaskIdsResponse)
+@router.get("/tasks/add", response_model=TaskIdsResponse)
 def get_task_ids() -> TaskIdsResponse:
     return TaskIdsResponse(task_ids=list_task_ids())
 
 
-@router.get("/add/tasks/{task_id}", response_model=TaskDetailResponse)
+@router.get("/tasks/add/{task_id}", response_model=TaskDetailResponse)
 def get_task_status(task_id: str) -> TaskDetailResponse:
     try:
         task = get_task(task_id)
