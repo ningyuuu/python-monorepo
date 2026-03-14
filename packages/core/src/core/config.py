@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     celery_result_backend: str = "redis://localhost:6379/1"
     database_url: str = "postgresql+psycopg://postgres:postgres@localhost:5432/main"
     log_level: str = "INFO"
+    openai_api_key: str | None = None
+    openai_model: str = "gpt-5-nano"
 
     model_config = SettingsConfigDict(
         env_file=".env",

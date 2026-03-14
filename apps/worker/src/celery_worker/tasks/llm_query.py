@@ -1,6 +1,6 @@
 import logging
-import os
 
+from core.config import get_settings
 from openai import OpenAI
 
 from celery_worker.celery_app import celery_app
@@ -16,11 +16,12 @@ def llm_query_task(question: str, model: str | None = None) -> str:
     if not cleaned_question:
         raise ValueError("question must not be empty")
 
-    api_key = os.getenv("OPENAI_API_KEY")
+    settings = get_settings()
+    api_key = (settings.openai_api_key or "").strip()
     if not api_key:
-        raise ValueError("OPENAI_API_KEY is not set")
+        raise ValueError("OPENAI_API_KEY is not set. Add it to your environment or .env file.")
 
-    resolved_model = model or os.getenv("OPENAI_MODEL", DEFAULT_MODEL)
+    resolved_model = model or settings.openai_model or DEFAULT_MODEL
     client = OpenAI(api_key=api_key)
     response = client.responses.create(
         model=resolved_model,
