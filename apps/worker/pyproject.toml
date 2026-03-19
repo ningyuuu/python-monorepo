@@ -5,16 +5,19 @@ description = "Celery worker for python-monorepo"
 requires-python = ">=3.12"
 dependencies = [
   "celery[redis]>=5.5.3",
+  "monorepo-blob",
   "monorepo-core",
   "monorepo-domain",
   "monorepo-tasks-db",
   "openai>=1.108.1",
+  "pypdf>=6.9.1",
 ]
 
 [tool.uv.sources]
 monorepo-core = { workspace = true }
 monorepo-domain = { workspace = true }
 monorepo-tasks-db = { workspace = true }
+monorepo-blob = { workspace = true }
 
 [build-system]
 requires = ["hatchling>=1.27.0"]
