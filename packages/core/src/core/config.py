@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     openai_api_key: str | None = None
     openai_model: str = "gpt-5-nano"
+    blob_read_write_token: str | None = None
 
     model_config = SettingsConfigDict(
         env_file=".env",
