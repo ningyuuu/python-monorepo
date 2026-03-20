@@ -9,6 +9,7 @@ members = [
     "monorepo-contracts",
     "monorepo-core",
     "monorepo-domain",
+    "monorepo-llm",
     "monorepo-tasks-db",
     "monorepo-worker",
 ]
@@ -693,6 +694,21 @@ dependencies = [
 requires-dist = [{ name = "monorepo-contracts", editable = "packages/contracts" }]
 
 [[package]]
+name = "monorepo-llm"
+version = "0.1.0"
+source = { editable = "packages/llm" }
+dependencies = [
+    { name = "monorepo-core" },
+    { name = "openai" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "monorepo-core", editable = "packages/core" },
+    { name = "openai", specifier = ">=1.108.1" },
+]
+
+[[package]]
 name = "monorepo-tasks-db"
 version = "0.1.0"
 source = { editable = "packages/tasks-db" }
@@ -718,8 +734,8 @@ dependencies = [
     { name = "monorepo-blob" },
     { name = "monorepo-core" },
     { name = "monorepo-domain" },
+    { name = "monorepo-llm" },
     { name = "monorepo-tasks-db" },
-    { name = "openai" },
     { name = "pypdf" },
 ]
 
@@ -729,8 +745,8 @@ requires-dist = [
     { name = "monorepo-blob", editable = "packages/blob" },
     { name = "monorepo-core", editable = "packages/core" },
     { name = "monorepo-domain", editable = "packages/domain" },
+    { name = "monorepo-llm", editable = "packages/llm" },
     { name = "monorepo-tasks-db", editable = "packages/tasks-db" },
-    { name = "openai", specifier = ">=1.108.1" },
     { name = "pypdf", specifier = ">=6.9.1" },
 ]
 

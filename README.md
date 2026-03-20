@@ -16,6 +16,7 @@ A Python-native monorepo for a FastAPI service, a Celery worker, and shared inte
 - `apps/api` — FastAPI app
 - `apps/worker` — Celery worker
 - `packages/core` — shared config and runtime helpers
+- `packages/llm` — shared OpenAI client helpers and workflows
 - `packages/domain` — reusable domain logic
 - `packages/contracts` — shared Pydantic models
 - `packages/tasks-db` — shared PostgreSQL task persistence library

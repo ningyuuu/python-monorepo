@@ -8,14 +8,15 @@ dependencies = [
   "monorepo-blob",
   "monorepo-core",
   "monorepo-domain",
+  "monorepo-llm",
   "monorepo-tasks-db",
-  "openai>=1.108.1",
   "pypdf>=6.9.1",
 ]
 
 [tool.uv.sources]
 monorepo-core = { workspace = true }
 monorepo-domain = { workspace = true }
+monorepo-llm = { workspace = true }
 monorepo-tasks-db = { workspace = true }
 monorepo-blob = { workspace = true }
 

@@ -1,0 +1,16 @@
+[project]
+name = "monorepo-llm"
+version = "0.1.0"
+description = "Reusable OpenAI helpers for python-monorepo"
+requires-python = ">=3.12"
+dependencies = ["monorepo-core", "openai>=1.108.1"]
+
+[tool.uv.sources]
+monorepo-core = { workspace = true }
+
+[build-system]
+requires = ["hatchling>=1.27.0"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/llm"]
