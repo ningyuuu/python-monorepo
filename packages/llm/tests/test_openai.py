@@ -7,8 +7,20 @@ class _FakeResponsesClient:
         self.output_text = output_text
         self.calls: list[dict[str, object]] = []
 
-    def create(self, *, model: str, input: list[dict[str, str]]) -> object:
-        self.calls.append({"model": model, "input": input})
+    def create(
+        self,
+        *,
+        model: str,
+        input: list[dict[str, str]],
+        max_output_tokens: int | None = None,
+    ) -> object:
+        self.calls.append(
+            {
+                "model": model,
+                "input": input,
+                "max_output_tokens": max_output_tokens,
+            }
+        )
         return type("Response", (), {"output_text": self.output_text})()
 
 
@@ -24,6 +36,7 @@ def test_generate_text_calls_openai_responses_api() -> None:
             system_prompt=" You are concise. ",
             user_prompt=" What is 2+2? ",
             model="gpt-test",
+            max_output_tokens=32,
         ),
         settings=Settings(openai_api_key="test-key", openai_model="gpt-default"),
         client=client,
@@ -33,6 +46,7 @@ def test_generate_text_calls_openai_responses_api() -> None:
     assert client.responses.calls == [
         {
             "model": "gpt-test",
+            "max_output_tokens": 32,
             "input": [
                 {"role": "system", "content": "You are concise."},
                 {"role": "user", "content": "What is 2+2?"},
@@ -64,3 +78,20 @@ def test_generate_text_rejects_blank_user_prompt() -> None:
         assert str(exc) == "user_prompt must not be empty"
     else:
         raise AssertionError("Expected generate_text to reject a blank user prompt")
+
+
+def test_generate_text_rejects_non_positive_output_token_limit() -> None:
+    try:
+        generate_text(
+            TextGenerationRequest(
+                system_prompt="You are concise.",
+                user_prompt="Hello",
+                max_output_tokens=0,
+            ),
+            settings=Settings(openai_api_key="test-key", openai_model="gpt-default"),
+            client=_FakeOpenAIClient("unused"),
+        )
+    except ValueError as exc:
+        assert str(exc) == "max_output_tokens must be greater than 0"
+    else:
+        raise AssertionError("Expected generate_text to reject a non-positive output token limit")
