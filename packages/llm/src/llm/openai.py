@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from core.config import Settings, get_settings
 from openai import OpenAI
 
-DEFAULT_MODEL = "gpt-5-nano"
+DEFAULT_MODEL = "gpt-5.4-nano"
 
 
 @dataclass(frozen=True, slots=True)
