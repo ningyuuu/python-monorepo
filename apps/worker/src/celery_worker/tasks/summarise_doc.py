@@ -10,12 +10,17 @@ from celery_worker.celery_app import celery_app
 
 logger = logging.getLogger(__name__)
 
-SUMMARY_SYSTEM_PROMPT = (
-    "You are a concise document summarisation assistant. Summarise the provided document "
-    "clearly and accurately. Focus on the main points, key facts, decisions, and action "
-    "items. Do not invent details that are not present in the source text."
-)
-SUMMARY_MAX_OUTPUT_TOKENS = 4096
+SUMMARISE_DOC_GENERATION_PARAMS = {
+    "system_prompt": (
+        "You are a concise document summarisation assistant. Summarise the provided document "
+        "clearly and accurately. Focus on the main points, key facts, decisions, and action "
+        "items. Do not invent details that are not present in the source text."
+    ),
+    "max_output_tokens": 4096,
+    "reasoning_effort": None,
+    "text_verbosity": None,
+    "user_prompt_template": "Summarise the following document:\n\n{document_text}",
+}
 
 
 def _extract_text(blob_link: str, data: bytes) -> str:
@@ -32,11 +37,19 @@ def _summarise_text(text: str) -> str:
     if not cleaned_text:
         raise ValueError("text must not be empty")
 
+    user_prompt = SUMMARISE_DOC_GENERATION_PARAMS["user_prompt_template"].format(
+        document_text=cleaned_text
+    )
+    request_params = {
+        key: value
+        for key, value in SUMMARISE_DOC_GENERATION_PARAMS.items()
+        if key != "user_prompt_template"
+    }
+
     result = generate_text(
         TextGenerationRequest(
-            system_prompt=SUMMARY_SYSTEM_PROMPT,
-            user_prompt=f"Summarise the following document:\n\n{cleaned_text}",
-            max_output_tokens=SUMMARY_MAX_OUTPUT_TOKENS,
+            user_prompt=user_prompt,
+            **request_params,
         )
     )
     return result.text

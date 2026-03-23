@@ -7,6 +7,13 @@ from celery_worker.celery_app import celery_app
 
 logger = logging.getLogger(__name__)
 
+LLM_QUERY_GENERATION_PARAMS = {
+    "system_prompt": "You are a concise, helpful Q&A assistant.",
+    "max_output_tokens": 1024,
+    "reasoning_effort": None,
+    "text_verbosity": None,
+}
+
 
 @celery_app.task(name="celery_worker.llm_query")
 def llm_query_task(task_id: str) -> str:
@@ -21,9 +28,8 @@ def llm_query_task(task_id: str) -> str:
 
         result = generate_text(
             TextGenerationRequest(
-                system_prompt="You are a concise, helpful Q&A assistant.",
                 user_prompt=cleaned_question,
-                max_output_tokens=1024,
+                **LLM_QUERY_GENERATION_PARAMS,
             )
         )
 
