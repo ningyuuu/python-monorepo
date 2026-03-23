@@ -23,7 +23,7 @@ def llm_query_task(task_id: str) -> str:
             TextGenerationRequest(
                 system_prompt="You are a concise, helpful Q&A assistant.",
                 user_prompt=cleaned_question,
-                max_output_tokens=256,
+                max_output_tokens=1024,
             )
         )
 

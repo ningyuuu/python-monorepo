@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+psycopg://postgres:postgres@localhost:5432/main"
     log_level: str = "INFO"
     openai_api_key: str | None = None
-    openai_model: str = "gpt-5-nano"
+    openai_model: str = "gpt-5.4-nano"
     blob_read_write_token: str | None = None
 
     model_config = SettingsConfigDict(

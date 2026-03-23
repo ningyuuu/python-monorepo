@@ -27,11 +27,11 @@ def test_llm_query_task_delegates_to_llm_package(monkeypatch: pytest.MonkeyPatch
     monkeypatch.setattr(
         llm_query_module,
         "generate_text",
-        lambda request: TextGenerationResult(text="4", model="gpt-5-nano"),
+        lambda request: TextGenerationResult(text="4", model="gpt-5.4-nano"),
     )
 
     assert llm_query_module.llm_query_task("task-123") == "4"
-    assert completed_payload == {"answer": "4", "model": "gpt-5-nano"}
+    assert completed_payload == {"answer": "4", "model": "gpt-5.4-nano"}
 
 
 def test_llm_query_task_rejects_blank_question(monkeypatch: pytest.MonkeyPatch) -> None:
