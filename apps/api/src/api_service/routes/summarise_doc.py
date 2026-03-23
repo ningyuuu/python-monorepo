@@ -5,7 +5,6 @@ from fastapi import APIRouter, HTTPException, status
 from tasks_db import TaskNotFoundError, create_task, get_task, mark_task_failed
 
 router = APIRouter(tags=["tasks"])
-TASK_QUEUE = "celery"
 
 settings = get_settings()
 celery_client = Celery(
@@ -13,7 +12,7 @@ celery_client = Celery(
     broker=settings.celery_broker_url,
     backend=settings.celery_result_backend,
 )
-celery_client.conf.task_default_queue = TASK_QUEUE
+celery_client.conf.task_default_queue = settings.task_queue
 
 
 @router.post(
@@ -35,7 +34,7 @@ def enqueue_summarise_doc(payload: SummariseDocRequest) -> TaskAcceptedResponse:
         celery_client.send_task(
             "celery_worker.summarise_doc",
             args=[task_record.id],
-            queue=TASK_QUEUE,
+            queue=settings.task_queue,
         )
     except Exception as exc:
         mark_task_failed(task_record.id, f"Failed to dispatch task: {exc}")

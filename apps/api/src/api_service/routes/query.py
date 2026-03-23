@@ -1,19 +1,9 @@
-from celery import Celery
+from api_service.celery_client import send_worker_task
 from contracts import QueryRequest, TaskAcceptedResponse, TaskDetailResponse, TaskStatus
-from core import get_settings
 from fastapi import APIRouter, HTTPException, status
 from tasks_db import TaskNotFoundError, create_task, get_task, mark_task_failed
 
 router = APIRouter(tags=["tasks"])
-TASK_QUEUE = "celery"
-
-settings = get_settings()
-celery_client = Celery(
-    "api-service",
-    broker=settings.celery_broker_url,
-    backend=settings.celery_result_backend,
-)
-celery_client.conf.task_default_queue = TASK_QUEUE
 
 
 @router.post(
@@ -23,11 +13,7 @@ def enqueue_query(payload: QueryRequest) -> TaskAcceptedResponse:
     task_record = create_task(task_name="llm_query", payload={"question": payload.question})
 
     try:
-        celery_client.send_task(
-            "celery_worker.llm_query",
-            args=[task_record.id],
-            queue=TASK_QUEUE,
-        )
+        send_worker_task("celery_worker.llm_query", task_record.id)
     except Exception as exc:
         mark_task_failed(task_record.id, f"Failed to dispatch task: {exc}")
         raise HTTPException(status_code=503, detail="Unable to enqueue task") from exc

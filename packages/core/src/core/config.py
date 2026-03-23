@@ -6,6 +6,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     app_name: str = "python-monorepo-api"
     app_env: str = "development"
+    task_queue: str = "celery"
     celery_broker_url: str = "redis://localhost:6379/0"
     celery_result_backend: str = "redis://localhost:6379/1"
     database_url: str = "postgresql+psycopg://postgres:postgres@localhost:5432/main"
