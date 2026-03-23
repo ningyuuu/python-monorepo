@@ -1,4 +1,3 @@
-from api_service.celery_client import send_worker_task
 from contracts import (
     AddNumbersRequest,
     TaskAcceptedResponse,
@@ -14,6 +13,8 @@ from tasks_db import (
     list_task_ids,
     mark_task_failed,
 )
+
+from api_service.celery_client import send_worker_task
 
 router = APIRouter(tags=["tasks"])
 

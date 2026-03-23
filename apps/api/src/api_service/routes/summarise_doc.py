@@ -1,18 +1,10 @@
-from celery import Celery
 from contracts import SummariseDocRequest, TaskAcceptedResponse, TaskDetailResponse, TaskStatus
-from core import get_settings
 from fastapi import APIRouter, HTTPException, status
 from tasks_db import TaskNotFoundError, create_task, get_task, mark_task_failed
 
-router = APIRouter(tags=["tasks"])
+from api_service.celery_client import send_worker_task
 
-settings = get_settings()
-celery_client = Celery(
-    "api-service",
-    broker=settings.celery_broker_url,
-    backend=settings.celery_result_backend,
-)
-celery_client.conf.task_default_queue = settings.task_queue
+router = APIRouter(tags=["tasks"])
 
 
 @router.post(
@@ -31,11 +23,7 @@ def enqueue_summarise_doc(payload: SummariseDocRequest) -> TaskAcceptedResponse:
     )
 
     try:
-        celery_client.send_task(
-            "celery_worker.summarise_doc",
-            args=[task_record.id],
-            queue=settings.task_queue,
-        )
+        send_worker_task("celery_worker.summarise_doc", task_record.id)
     except Exception as exc:
         mark_task_failed(task_record.id, f"Failed to dispatch task: {exc}")
         raise HTTPException(status_code=503, detail="Unable to enqueue task") from exc
