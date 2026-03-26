@@ -13,10 +13,30 @@ def test_split_document_into_chunks_respects_character_limit() -> None:
 
 def test_combine_quotation_items_deduplicates_items() -> None:
     chunk_results = [
-        [{"name": "Item 1", "unit_cost": 10.0, "qty_count": 1.0, "remarks": "A"}],
         [
-            {"name": "item 1", "unit_cost": 10.0, "qty_count": 1.0, "remarks": "a"},
-            {"name": "Item 2", "unit_cost": 20.0, "qty_count": 2.0, "remarks": "B"},
+            {
+                "name": "Item 1",
+                "unit": "m2",
+                "unit_cost": 10.0,
+                "qty_count": 1.0,
+                "remarks": "A",
+            }
+        ],
+        [
+            {
+                "name": "item 1",
+                "unit": "M2",
+                "unit_cost": 10.0,
+                "qty_count": 1.0,
+                "remarks": "a",
+            },
+            {
+                "name": "Item 2",
+                "unit": "nos",
+                "unit_cost": 20.0,
+                "qty_count": 2.0,
+                "remarks": "B",
+            },
         ],
     ]
 
@@ -59,6 +79,7 @@ def test_extract_data_task_handles_single_chunk_inline(
         lambda _chunk: [
             {
                 "name": "Item 1",
+                "unit": "m2",
                 "unit_cost": 10.0,
                 "qty_count": 1.0,
                 "remarks": "A",

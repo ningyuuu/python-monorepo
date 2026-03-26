@@ -25,7 +25,7 @@ EXTRACT_ITEMS_RULES = (
     "Rules:\n"
     "- Return only individual quoted items; do not return subtotals.\n"
     "- Return all items found in the provided text chunk, not just a few examples.\n"
-    "- Return item name, unit cost, quantity, and remarks with useful context.\n"
+    "- Return item name, unit of measure, unit cost, quantity, and remarks with useful context.\n"
     "- If there are child items, return the child items instead of subtotal rows.\n"
     "- Exclude subtotals, totals, GST, remarks-only rows, headings, and aggregates.\n"
     "- Return JSON only.\n\n"
@@ -39,6 +39,7 @@ class QuotedItem(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
     name: str | None = ""
+    unit: str | None = ""
     unit_cost: float | None = 0.0
     qty_count: float | None = 0.0
     remarks: str | None = ""
@@ -120,13 +121,14 @@ def _extract_quotation_items(document_text: str) -> QuotationItems:
 
 def _combine_quotation_items(chunk_results: list[list[dict[str, Any]]]) -> QuotationItems:
     combined_items: list[QuotedItem] = []
-    seen: set[tuple[str, float, float, str]] = set()
+    seen: set[tuple[str, str, float, float, str]] = set()
 
     for chunk_items in chunk_results:
         for item_payload in chunk_items:
             item = QuotedItem.model_validate(item_payload)
             key = (
                 (item.name or "").strip().lower(),
+                (item.unit or "").strip().lower(),
                 float(item.unit_cost or 0.0),
                 float(item.qty_count or 0.0),
                 (item.remarks or "").strip().lower(),
