@@ -18,6 +18,7 @@ target-version = "py312"
 select = ["B", "E", "F", "I", "UP"]
 
 [tool.pytest.ini_options]
+addopts = ["--import-mode=importlib"]
 pythonpath = [
   "apps/api/src",
   "apps/worker/src",

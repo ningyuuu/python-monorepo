@@ -114,6 +114,12 @@ def test_worker_summarise_text_delegates_to_generate_text(
     assert summarise_doc_module._summarise_text("  Document body  ") == "Summary"
     request = captured_request[0]
     assert isinstance(request, summarise_doc_module.TextGenerationRequest)
-    assert request.system_prompt == summarise_doc_module.SUMMARY_SYSTEM_PROMPT
+    assert (
+        request.system_prompt
+        == summarise_doc_module.SUMMARISE_DOC_GENERATION_PARAMS["system_prompt"]
+    )
     assert request.user_prompt == "Summarise the following document:\n\nDocument body"
-    assert request.max_output_tokens == summarise_doc_module.SUMMARY_MAX_OUTPUT_TOKENS
+    assert (
+        request.max_output_tokens
+        == summarise_doc_module.SUMMARISE_DOC_GENERATION_PARAMS["max_output_tokens"]
+    )
