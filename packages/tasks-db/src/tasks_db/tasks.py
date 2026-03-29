@@ -24,10 +24,11 @@ def _get_task_record(session: Session, task_id: str) -> TaskRecord:
     return task
 
 
-def create_task(task_name: str, payload: Payload) -> TaskRecord:
+def create_task(task_name: str, payload: Payload, email: str) -> TaskRecord:
     init_db()
     task = TaskRecord(
         id=str(uuid4()),
+        email=email,
         task_name=task_name,
         payload=payload,
         status=TaskStatus.queued,

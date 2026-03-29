@@ -1,10 +1,11 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, EmailStr
 
 
 class QueryRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     question: str
+    email: EmailStr
 
 
 class SummariseDocRequest(BaseModel):
@@ -13,6 +14,7 @@ class SummariseDocRequest(BaseModel):
     user_link: str
     blob_link: str
     blob_type: str
+    email: EmailStr
 
 
 class ExtractDataRequest(BaseModel):
@@ -21,3 +23,4 @@ class ExtractDataRequest(BaseModel):
     user_link: str
     blob_link: str
     blob_type: str
+    email: EmailStr
