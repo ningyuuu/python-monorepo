@@ -20,6 +20,7 @@ def enqueue_summarise_doc(payload: SummariseDocRequest) -> TaskAcceptedResponse:
             "blob_link": payload.blob_link,
             "blob_type": payload.blob_type,
         },
+        email=str(payload.email),
     )
 
     try:

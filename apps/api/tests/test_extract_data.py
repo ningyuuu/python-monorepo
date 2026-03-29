@@ -9,7 +9,7 @@ def test_enqueue_extract_data(monkeypatch) -> None:
     monkeypatch.setattr(
         extract_data_route,
         "create_task",
-        lambda task_name, payload: type("Task", (), {"id": "task-123"})(),
+        lambda task_name, payload, email: type("Task", (), {"id": "task-123"})(),
     )
     monkeypatch.setattr(extract_data_route, "send_worker_task", lambda _name, _task_id: None)
 
@@ -19,11 +19,26 @@ def test_enqueue_extract_data(monkeypatch) -> None:
             "user_link": "https://example.com/doc",
             "blob_link": "https://blob.vercel-storage.com/doc.pdf",
             "blob_type": "vercel",
+            "email": "person@example.com",
         },
     )
 
     assert response.status_code == 202
     assert response.json() == {"task_id": "task-123", "status": "queued"}
+
+
+def test_enqueue_extract_data_rejects_invalid_email() -> None:
+    response = client.post(
+        "/tasks/extract_data",
+        json={
+            "user_link": "https://example.com/doc",
+            "blob_link": "https://blob.vercel-storage.com/doc.pdf",
+            "blob_type": "vercel",
+            "email": "not-an-email",
+        },
+    )
+
+    assert response.status_code == 422
 
 
 def test_get_extract_data_task_status(monkeypatch) -> None:

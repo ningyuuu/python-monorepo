@@ -23,7 +23,11 @@ router = APIRouter(tags=["tasks"])
     "/tasks/add", response_model=TaskAcceptedResponse, status_code=status.HTTP_202_ACCEPTED
 )
 def enqueue_add(payload: AddNumbersRequest) -> TaskAcceptedResponse:
-    task_record = create_task(task_name="add_numbers", payload={"a": payload.a, "b": payload.b})
+    task_record = create_task(
+        task_name="add_numbers",
+        payload={"a": payload.a, "b": payload.b},
+        email=str(payload.email),
+    )
 
     try:
         send_worker_task("celery_worker.add_numbers", task_record.id)

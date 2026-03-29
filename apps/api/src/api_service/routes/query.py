@@ -1,7 +1,8 @@
-from api_service.celery_client import send_worker_task
 from contracts import QueryRequest, TaskAcceptedResponse, TaskDetailResponse, TaskStatus
 from fastapi import APIRouter, HTTPException, status
 from tasks_db import TaskNotFoundError, create_task, get_task, mark_task_failed
+
+from api_service.celery_client import send_worker_task
 
 router = APIRouter(tags=["tasks"])
 
@@ -10,7 +11,11 @@ router = APIRouter(tags=["tasks"])
     "/tasks/query", response_model=TaskAcceptedResponse, status_code=status.HTTP_202_ACCEPTED
 )
 def enqueue_query(payload: QueryRequest) -> TaskAcceptedResponse:
-    task_record = create_task(task_name="llm_query", payload={"question": payload.question})
+    task_record = create_task(
+        task_name="llm_query",
+        payload={"question": payload.question},
+        email=str(payload.email),
+    )
 
     try:
         send_worker_task("celery_worker.llm_query", task_record.id)

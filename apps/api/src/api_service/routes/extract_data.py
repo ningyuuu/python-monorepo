@@ -20,6 +20,7 @@ def enqueue_extract_data(payload: ExtractDataRequest) -> TaskAcceptedResponse:
             "blob_link": payload.blob_link,
             "blob_type": payload.blob_type,
         },
+        email=str(payload.email),
     )
 
     try:
