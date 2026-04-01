@@ -24,3 +24,12 @@ class ExtractQuoteRequest(BaseModel):
     blob_link: str
     blob_type: str
     email: EmailStr
+
+
+class ExtractPoItemsRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    user_link: str
+    blob_link: str
+    blob_type: str
+    email: EmailStr
