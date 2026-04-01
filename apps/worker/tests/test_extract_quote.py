@@ -1,11 +1,11 @@
 import pytest
-from celery_worker.tasks import extract_data as extract_data_module
+from celery_worker.tasks import extract_quote as extract_quote_module
 
 
 def test_split_document_into_chunks_respects_character_limit() -> None:
     document_text = "\n".join(["A" * 4000, "B" * 4000, "C" * 4000])
 
-    chunks = extract_data_module._split_document_into_chunks(document_text, chunk_chars=10000)
+    chunks = extract_quote_module._split_document_into_chunks(document_text, chunk_chars=10000)
 
     assert len(chunks) == 2
     assert all(len(chunk) <= 10000 for chunk in chunks)
@@ -40,18 +40,18 @@ def test_combine_quotation_items_deduplicates_items() -> None:
         ],
     ]
 
-    combined = extract_data_module._combine_quotation_items(chunk_results)
+    combined = extract_quote_module._combine_quotation_items(chunk_results)
 
     assert len(combined.items) == 2
 
 
-def test_extract_data_task_handles_single_chunk_inline(
+def test_extract_quote_task_handles_single_chunk_inline(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     completed_payload: dict[str, object] = {}
 
     monkeypatch.setattr(
-        extract_data_module,
+        extract_quote_module,
         "get_task",
         lambda _task_id: type(
             "Task",
@@ -59,23 +59,31 @@ def test_extract_data_task_handles_single_chunk_inline(
             {"payload": {"blob_link": "doc.txt", "blob_type": "vercel"}},
         )(),
     )
-    monkeypatch.setattr(extract_data_module, "mark_task_in_progress", lambda _task_id: None)
     monkeypatch.setattr(
-        extract_data_module,
+        extract_quote_module, "mark_task_in_progress", lambda _task_id: None
+    )
+    monkeypatch.setattr(
+        extract_quote_module,
         "mark_task_completed",
         lambda _task_id, payload: completed_payload.update(payload),
     )
-    monkeypatch.setattr(extract_data_module, "mark_task_failed", lambda _task_id, _error: None)
-    monkeypatch.setattr(extract_data_module, "get_bytes", lambda _blob_link: b"Document body")
-    monkeypatch.setattr(extract_data_module, "_extract_text", lambda _link, _data: "Document body")
     monkeypatch.setattr(
-        extract_data_module,
+        extract_quote_module, "mark_task_failed", lambda _task_id, _error: None
+    )
+    monkeypatch.setattr(
+        extract_quote_module, "get_bytes", lambda _blob_link: b"Document body"
+    )
+    monkeypatch.setattr(
+        extract_quote_module, "_extract_text", lambda _link, _data: "Document body"
+    )
+    monkeypatch.setattr(
+        extract_quote_module,
         "_split_document_into_chunks",
         lambda _text, **_kwargs: ["chunk"],
     )
     monkeypatch.setattr(
-        extract_data_module,
-        "extract_data_chunk_task",
+        extract_quote_module,
+        "extract_quote_chunk_task",
         lambda _chunk: [
             {
                 "name": "Item 1",
@@ -87,7 +95,10 @@ def test_extract_data_task_handles_single_chunk_inline(
         ],
     )
 
-    assert extract_data_module.extract_data_task("task-123") == "Processed 1 chunk"
+    assert (
+        extract_quote_module.extract_quote_task("task-123")
+        == "Processed 1 chunk"
+    )
     assert "items" in completed_payload
 
 
@@ -101,7 +112,9 @@ class _SignatureStub:
         self.errback = errback
 
 
-def test_extract_data_task_fans_out_multiple_chunks(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_extract_quote_task_fans_out_multiple_chunks(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     created_signatures: list[_SignatureStub] = []
     captured_chord: dict[str, object] = {}
 
@@ -119,7 +132,7 @@ def test_extract_data_task_fans_out_multiple_chunks(monkeypatch: pytest.MonkeyPa
         return _apply
 
     monkeypatch.setattr(
-        extract_data_module,
+        extract_quote_module,
         "get_task",
         lambda _task_id: type(
             "Task",
@@ -127,19 +140,27 @@ def test_extract_data_task_fans_out_multiple_chunks(monkeypatch: pytest.MonkeyPa
             {"payload": {"blob_link": "doc.txt", "blob_type": "vercel"}},
         )(),
     )
-    monkeypatch.setattr(extract_data_module, "mark_task_in_progress", lambda _task_id: None)
-    monkeypatch.setattr(extract_data_module, "mark_task_failed", lambda _task_id, _error: None)
-    monkeypatch.setattr(extract_data_module, "get_bytes", lambda _blob_link: b"Document body")
-    monkeypatch.setattr(extract_data_module, "_extract_text", lambda _link, _data: "Document body")
     monkeypatch.setattr(
-        extract_data_module,
+        extract_quote_module, "mark_task_in_progress", lambda _task_id: None
+    )
+    monkeypatch.setattr(
+        extract_quote_module, "mark_task_failed", lambda _task_id, _error: None
+    )
+    monkeypatch.setattr(
+        extract_quote_module, "get_bytes", lambda _blob_link: b"Document body"
+    )
+    monkeypatch.setattr(
+        extract_quote_module, "_extract_text", lambda _link, _data: "Document body"
+    )
+    monkeypatch.setattr(
+        extract_quote_module,
         "_split_document_into_chunks",
         lambda _text, **_kwargs: ["chunk-1", "chunk-2"],
     )
-    monkeypatch.setattr(extract_data_module.celery_app, "signature", fake_signature)
-    monkeypatch.setattr(extract_data_module, "chord", fake_chord)
+    monkeypatch.setattr(extract_quote_module.celery_app, "signature", fake_signature)
+    monkeypatch.setattr(extract_quote_module, "chord", fake_chord)
 
-    result = extract_data_module.extract_data_task("task-123")
+    result = extract_quote_module.extract_quote_task("task-123")
 
     assert result == "Dispatched 2 chunks"
     assert "header" in captured_chord

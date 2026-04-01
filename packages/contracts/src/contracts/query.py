@@ -17,7 +17,7 @@ class SummariseDocRequest(BaseModel):
     email: EmailStr
 
 
-class ExtractDataRequest(BaseModel):
+class ExtractQuoteRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     user_link: str

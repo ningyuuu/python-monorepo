@@ -14,7 +14,7 @@ from celery_worker.celery_app import celery_app
 
 logger = logging.getLogger(__name__)
 
-EXTRACT_DATA_SYSTEM_PROMPT = """You are a processor of raw PDF quotation, BOQ, tender,
+EXTRACT_QUOTE_SYSTEM_PROMPT = """You are a processor of raw PDF quotation, BOQ, tender,
 and pricing document text.
 
 Follow the user's task exactly and return only the requested result.
@@ -94,7 +94,7 @@ def _split_document_into_chunks(
     return [chunk for chunk in chunks if chunk]
 
 
-def _extract_quotation_items(document_text: str) -> QuotationItems:
+def _extract_quote(document_text: str) -> QuotationItems:
     cleaned_text = document_text.strip()
     if not cleaned_text:
         raise ValueError("document_text must not be empty")
@@ -108,7 +108,7 @@ def _extract_quotation_items(document_text: str) -> QuotationItems:
 
     result = generate_text(
         TextGenerationRequest(
-            system_prompt=EXTRACT_DATA_SYSTEM_PROMPT,
+            system_prompt=EXTRACT_QUOTE_SYSTEM_PROMPT,
             user_prompt=(f"Document text:\n\n{cleaned_text}\n\n{task_prompt}"),
             max_output_tokens=EXTRACT_MAX_OUTPUT_TOKENS,
             reasoning_effort=None,
@@ -141,14 +141,14 @@ def _combine_quotation_items(chunk_results: list[list[dict[str, Any]]]) -> Quota
     return QuotationItems(items=combined_items)
 
 
-@celery_app.task(name="celery_worker.extract_data_chunk")
-def extract_data_chunk_task(chunk_text: str) -> list[dict[str, Any]]:
-    chunk_items = _extract_quotation_items(chunk_text)
+@celery_app.task(name="celery_worker.extract_quote_chunk")
+def extract_quote_chunk_task(chunk_text: str) -> list[dict[str, Any]]:
+    chunk_items = _extract_quote(chunk_text)
     return [item.model_dump() for item in chunk_items.items]
 
 
-@celery_app.task(name="celery_worker.extract_data_finalize")
-def extract_data_finalize_task(
+@celery_app.task(name="celery_worker.extract_quote_finalize")
+def extract_quote_finalize_task(
     chunk_results: list[list[dict[str, Any]]],
     parent_task_id: str,
 ) -> dict[str, Any]:
@@ -157,7 +157,7 @@ def extract_data_finalize_task(
         serialized_items = [item.model_dump() for item in combined_items.items]
         mark_task_completed(parent_task_id, {"items": serialized_items})
         logger.info(
-            "Processed extract_data task",
+            "Processed extract_quote task",
             extra={"task_id": parent_task_id, "items_count": len(serialized_items)},
         )
         return {"items_count": len(serialized_items)}
@@ -166,8 +166,8 @@ def extract_data_finalize_task(
         raise
 
 
-@celery_app.task(name="celery_worker.extract_data_error")
-def extract_data_error_task(
+@celery_app.task(name="celery_worker.extract_quote_error")
+def extract_quote_error_task(
     request: Any,
     exc: Exception,
     traceback: Any,
@@ -176,8 +176,8 @@ def extract_data_error_task(
     mark_task_failed(parent_task_id, f"Chunk extraction failed: {exc}")
 
 
-@celery_app.task(name="celery_worker.extract_data")
-def extract_data_task(task_id: str) -> str:
+@celery_app.task(name="celery_worker.extract_quote")
+def extract_quote_task(task_id: str) -> str:
     resolved_task_id = str(task_id)
     task = get_task(resolved_task_id)
     mark_task_in_progress(resolved_task_id)
@@ -199,26 +199,26 @@ def extract_data_task(task_id: str) -> str:
             raise ValueError("document did not produce any chunks")
 
         if len(chunks) == 1:
-            chunk_items = extract_data_chunk_task(chunks[0])
-            extract_data_finalize_task([chunk_items], resolved_task_id)
+            chunk_items = extract_quote_chunk_task(chunks[0])
+            extract_quote_finalize_task([chunk_items], resolved_task_id)
             return "Processed 1 chunk"
 
         header = [
-            celery_app.signature("celery_worker.extract_data_chunk", args=[chunk])
+            celery_app.signature("celery_worker.extract_quote_chunk", args=[chunk])
             for chunk in chunks
         ]
         callback_signature = celery_app.signature(
-            "celery_worker.extract_data_finalize",
+            "celery_worker.extract_quote_finalize",
             args=[resolved_task_id],
         )
         callback_signature.link_error(
-            celery_app.signature("celery_worker.extract_data_error", args=[resolved_task_id])
+            celery_app.signature("celery_worker.extract_quote_error", args=[resolved_task_id])
         )
 
         chord(header)(callback_signature)
 
         logger.info(
-            "Dispatched extract_data chunk tasks",
+            "Dispatched extract_quote chunk tasks",
             extra={"task_id": resolved_task_id, "chunks_count": len(chunks)},
         )
         return f"Dispatched {len(chunks)} chunks"
