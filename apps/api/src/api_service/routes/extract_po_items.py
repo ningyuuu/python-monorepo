@@ -2,10 +2,12 @@ from contracts import (
     ExtractPoItemsRequest,
     TaskAcceptedResponse,
     TaskDetailResponse,
+    TaskListItem,
+    TaskListResponse,
     TaskStatus,
 )
 from fastapi import APIRouter, HTTPException, status
-from tasks_db import TaskNotFoundError, create_task, get_task, mark_task_failed
+from tasks_db import TaskNotFoundError, create_task, get_task, list_tasks, mark_task_failed
 
 from api_service.celery_client import send_worker_task
 
@@ -49,4 +51,23 @@ def get_extract_po_items_task_status(task_id: str) -> TaskDetailResponse:
         status=TaskStatus(task.status),
         result=task.result,
         error=task.error,
+    )
+
+
+@router.get("/tasks/extract_po_items", response_model=TaskListResponse)
+def list_extract_po_items_tasks(limit: int = 50) -> TaskListResponse:
+    tasks = list_tasks(task_name="extract_po_items", limit=limit)
+    return TaskListResponse(
+        tasks=[
+            TaskListItem(
+                task_id=task.id,
+                email=task.email,
+                task_name=task.task_name,
+                status=TaskStatus(task.status),
+                created_at=task.created_at,
+                result=task.result,
+                error=task.error,
+            )
+            for task in tasks
+        ]
     )

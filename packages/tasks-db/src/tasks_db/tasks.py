@@ -55,6 +55,19 @@ def list_task_ids() -> list[str]:
         return list(session.scalars(statement))
 
 
+def list_tasks(task_name: str | None = None, limit: int = 50) -> list[TaskRecord]:
+    init_db()
+    with get_session() as session:
+        statement = select(TaskRecord).order_by(TaskRecord.created_at.desc())
+        if task_name:
+            statement = statement.where(TaskRecord.task_name == task_name)
+        statement = statement.limit(limit)
+        tasks = list(session.scalars(statement))
+        for task in tasks:
+            session.expunge(task)
+        return tasks
+
+
 def mark_task_in_progress(task_id: str) -> TaskRecord:
     return _update_task(task_id=task_id, status=TaskStatus.in_progress, error=None)
 

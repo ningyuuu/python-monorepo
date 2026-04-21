@@ -1,7 +1,14 @@
 from .add import AddNumbersRequest
 from .health import HealthResponse
 from .query import ExtractPoItemsRequest, ExtractQuoteRequest, QueryRequest, SummariseDocRequest
-from .tasks import TaskAcceptedResponse, TaskDetailResponse, TaskIdsResponse, TaskStatus
+from .tasks import (
+    TaskAcceptedResponse,
+    TaskDetailResponse,
+    TaskIdsResponse,
+    TaskListItem,
+    TaskListResponse,
+    TaskStatus,
+)
 
 __all__ = [
     "AddNumbersRequest",
@@ -13,5 +20,7 @@ __all__ = [
     "TaskAcceptedResponse",
     "TaskDetailResponse",
     "TaskIdsResponse",
+    "TaskListItem",
+    "TaskListResponse",
     "TaskStatus",
 ]

@@ -1,3 +1,4 @@
+from datetime import datetime
 from enum import StrEnum
 from typing import Any
 
@@ -25,3 +26,17 @@ class TaskDetailResponse(BaseModel):
 
 class TaskIdsResponse(BaseModel):
     task_ids: list[str]
+
+
+class TaskListItem(BaseModel):
+    task_id: str
+    email: str
+    task_name: str
+    status: TaskStatus
+    created_at: datetime
+    result: dict[str, Any] | None
+    error: str | None
+
+
+class TaskListResponse(BaseModel):
+    tasks: list[TaskListItem]
