@@ -649,10 +649,6 @@ source = { editable = "apps/api" }
 dependencies = [
     { name = "celery", extra = ["redis"] },
     { name = "fastapi" },
-    { name = "monorepo-contracts" },
-    { name = "monorepo-core" },
-    { name = "monorepo-domain" },
-    { name = "monorepo-tasks-db" },
     { name = "uvicorn", extra = ["standard"] },
 ]
 
@@ -660,10 +656,6 @@ dependencies = [
 requires-dist = [
     { name = "celery", extras = ["redis"], specifier = ">=5.5.3" },
     { name = "fastapi", specifier = ">=0.116.1" },
-    { name = "monorepo-contracts", editable = "packages/contracts" },
-    { name = "monorepo-core", editable = "packages/core" },
-    { name = "monorepo-domain", editable = "packages/domain" },
-    { name = "monorepo-tasks-db", editable = "packages/tasks-db" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.35.0" },
 ]
 
