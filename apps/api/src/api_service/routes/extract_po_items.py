@@ -1,3 +1,5 @@
+import logging
+
 from contracts import (
     ExtractPoItemsRequest,
     TaskAcceptedResponse,
@@ -6,6 +8,7 @@ from contracts import (
     TaskListResponse,
     TaskStatus,
 )
+from core import get_settings
 from fastapi import APIRouter, HTTPException, status
 from tasks_db import TaskNotFoundError, create_task, get_task, list_tasks, mark_task_failed
 
@@ -20,6 +23,12 @@ router = APIRouter(tags=["tasks"])
     status_code=status.HTTP_202_ACCEPTED,
 )
 def enqueue_extract_po_items(payload: ExtractPoItemsRequest) -> TaskAcceptedResponse:
+
+    logger = logging.getLogger(__name__)
+    settings = get_settings()
+    logger.info("CELERY_BROKER_URL: %s", settings.celery_broker_url)
+    logger.info("CELERY_RESULT_BACKEND: %s", settings.celery_result_backend)
+
     task_record = create_task(
         task_name="extract_po_items",
         payload={
@@ -33,8 +42,9 @@ def enqueue_extract_po_items(payload: ExtractPoItemsRequest) -> TaskAcceptedResp
     try:
         send_worker_task("celery_worker.extract_po_items", task_record.id)
     except Exception as exc:
+        logger.exception("Failed to enqueue task: %s", exc)
         mark_task_failed(task_record.id, f"Failed to dispatch task: {exc}")
-        raise HTTPException(status_code=503, detail="Unable to enqueue task") from exc
+        raise HTTPException(status_code=503, detail=f"Unable to enqueue task: {exc}") from exc
 
     return TaskAcceptedResponse(task_id=task_record.id, status=TaskStatus.queued)
 
