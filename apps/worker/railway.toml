@@ -7,3 +7,4 @@ rootDirectory = "apps/worker"
 [deploy]
 startCommand = "uv run --project apps/worker celery -A celery_worker.celery_app:celery_app worker --loglevel=info"
 numReplicas = 1
+region = "us-east4"

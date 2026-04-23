@@ -6,3 +6,4 @@ dockerfilePath = "Dockerfile"
 [deploy]
 startCommand = "uv run --project apps/api uvicorn api_service.main:app --host 0.0.0.0 --port 8000"
 numReplicas = 1
+region = "us-east4"
