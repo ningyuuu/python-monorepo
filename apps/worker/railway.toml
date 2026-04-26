@@ -5,5 +5,5 @@ dockerfilePath = "Dockerfile"
 rootDirectory = "apps/worker"
 
 [deploy]
-startCommand = "uv run --project apps/worker celery -A celery_worker.celery_app:celery_app worker --loglevel=info --concurrency=2 --prefetch-multiplier=1"
+startCommand = "uv run --project apps/worker celery -A celery_worker.celery_app:celery_app worker --loglevel=info --concurrency=1 --prefetch-multiplier=1"
 numReplicas = 1
